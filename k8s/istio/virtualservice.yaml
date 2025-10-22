@@ -1,0 +1,77 @@
+---
+# Frontend VirtualService
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: frontend-vs
+  namespace: library-system
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - library-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/
+    route:
+    - destination:
+        host: api-gateway.library-system.svc.cluster.local
+        port:
+          number: 8080
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: frontend.library-system.svc.cluster.local
+        port:
+          number: 80
+---
+# User Service VirtualService (내부 통신용)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: user-service-vs
+  namespace: library-system
+spec:
+  hosts:
+  - user-service.library-system.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        host: user-service.library-system.svc.cluster.local
+        port:
+          number: 8080
+---
+# Book Service VirtualService (내부 통신용)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: book-service-vs
+  namespace: library-system
+spec:
+  hosts:
+  - book-service.library-system.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        host: book-service.library-system.svc.cluster.local
+        port:
+          number: 8080
+---
+# Cart Service VirtualService (내부 통신용)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: cart-service-vs
+  namespace: library-system
+spec:
+  hosts:
+  - cart-service.library-system.svc.cluster.local
+  http:
+  - route:
+    - destination:
+        host: cart-service.library-system.svc.cluster.local
+        port:
+          number: 8080

@@ -1,0 +1,36 @@
+---
+# MariaDB ServiceEntry (멤버 클러스터에서 중앙 클러스터의 MariaDB 접근)
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: mariadb-central-external
+  namespace: library-system
+spec:
+  hosts:
+  - mariadb-central.default.svc.cluster.local
+  addresses:
+  - 240.0.0.1  # 임의의 내부 주소 (실제로는 중앙 클러스터의 실제 IP 사용)
+  ports:
+  - number: 3306
+    name: mysql
+    protocol: TCP
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+# Redis ServiceEntry (멤버 클러스터에서 중앙 클러스터의 Redis 접근)
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: redis-central-external
+  namespace: library-system
+spec:
+  hosts:
+  - redis-central.default.svc.cluster.local
+  addresses:
+  - 240.0.0.2  # 임의의 내부 주소 (실제로는 중앙 클러스터의 실제 IP 사용)
+  ports:
+  - number: 6379
+    name: redis
+    protocol: TCP
+  location: MESH_EXTERNAL
+  resolution: DNS

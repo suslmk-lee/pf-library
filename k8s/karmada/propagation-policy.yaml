@@ -1,0 +1,182 @@
+---
+# Namespace 전파 정책
+apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
+metadata:
+  name: namespace-propagation
+  namespace: library-system
+spec:
+  resourceSelectors:
+  - apiVersion: v1
+    kind: Namespace
+    name: library-system
+  placement:
+    clusterAffinity:
+      clusterNames:
+      - naver
+      - nhn
+---
+# User Service 전파 정책
+apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
+metadata:
+  name: user-service-propagation
+  namespace: library-system
+spec:
+  resourceSelectors:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: user-service
+  - apiVersion: v1
+    kind: Service
+    name: user-service
+  placement:
+    clusterAffinity:
+      clusterNames:
+      - naver
+      - nhn
+    replicaScheduling:
+      replicaDivisionPreference: Weighted
+      replicaSchedulingType: Divided
+      weightPreference:
+        staticWeightList:
+        - targetCluster:
+            clusterNames:
+            - naver
+          weight: 1
+        - targetCluster:
+            clusterNames:
+            - nhn
+          weight: 1
+---
+# Book Service 전파 정책
+apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
+metadata:
+  name: book-service-propagation
+  namespace: library-system
+spec:
+  resourceSelectors:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: book-service
+  - apiVersion: v1
+    kind: Service
+    name: book-service
+  placement:
+    clusterAffinity:
+      clusterNames:
+      - naver
+      - nhn
+    replicaScheduling:
+      replicaDivisionPreference: Weighted
+      replicaSchedulingType: Divided
+      weightPreference:
+        staticWeightList:
+        - targetCluster:
+            clusterNames:
+            - naver
+          weight: 1
+        - targetCluster:
+            clusterNames:
+            - nhn
+          weight: 1
+---
+# Cart Service 전파 정책
+apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
+metadata:
+  name: cart-service-propagation
+  namespace: library-system
+spec:
+  resourceSelectors:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: cart-service
+  - apiVersion: v1
+    kind: Service
+    name: cart-service
+  placement:
+    clusterAffinity:
+      clusterNames:
+      - naver
+      - nhn
+    replicaScheduling:
+      replicaDivisionPreference: Weighted
+      replicaSchedulingType: Divided
+      weightPreference:
+        staticWeightList:
+        - targetCluster:
+            clusterNames:
+            - naver
+          weight: 1
+        - targetCluster:
+            clusterNames:
+            - nhn
+          weight: 1
+---
+# API Gateway 전파 정책
+apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
+metadata:
+  name: api-gateway-propagation
+  namespace: library-system
+spec:
+  resourceSelectors:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: api-gateway
+  - apiVersion: v1
+    kind: Service
+    name: api-gateway
+  placement:
+    clusterAffinity:
+      clusterNames:
+      - naver
+      - nhn
+    replicaScheduling:
+      replicaDivisionPreference: Weighted
+      replicaSchedulingType: Divided
+      weightPreference:
+        staticWeightList:
+        - targetCluster:
+            clusterNames:
+            - naver
+          weight: 1
+        - targetCluster:
+            clusterNames:
+            - nhn
+          weight: 1
+---
+# Frontend 전파 정책
+apiVersion: policy.karmada.io/v1alpha1
+kind: PropagationPolicy
+metadata:
+  name: frontend-propagation
+  namespace: library-system
+spec:
+  resourceSelectors:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: frontend
+  - apiVersion: v1
+    kind: Service
+    name: frontend
+  placement:
+    clusterAffinity:
+      clusterNames:
+      - naver
+      - nhn
+    replicaScheduling:
+      replicaDivisionPreference: Weighted
+      replicaSchedulingType: Divided
+      weightPreference:
+        staticWeightList:
+        - targetCluster:
+            clusterNames:
+            - naver
+          weight: 1
+        - targetCluster:
+            clusterNames:
+            - nhn
+          weight: 1

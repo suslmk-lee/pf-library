@@ -1,0 +1,144 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mariadb-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-initdb
+  namespace: default
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS library CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    USE library;
+
+    -- users 테이블
+    CREATE TABLE IF NOT EXISTS users (
+      id VARCHAR(50) PRIMARY KEY,
+      username VARCHAR(100) NOT NULL UNIQUE,
+      password VARCHAR(255) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+    -- books 테이블
+    CREATE TABLE IF NOT EXISTS books (
+      id VARCHAR(50) PRIMARY KEY,
+      title VARCHAR(255) NOT NULL,
+      author VARCHAR(100) NOT NULL,
+      publisher VARCHAR(100),
+      year INT,
+      isbn VARCHAR(20) UNIQUE,
+      description TEXT,
+      price DECIMAL(10, 2) NOT NULL,
+      cover_image VARCHAR(500),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+    -- 샘플 사용자 데이터
+    INSERT INTO users (id, username, password) VALUES
+      ('1', 'user', 'password'),
+      ('2', 'admin', 'admin123')
+    ON DUPLICATE KEY UPDATE username=username;
+
+    -- 샘플 도서 데이터
+    INSERT INTO books (id, title, author, publisher, year, isbn, description, price, cover_image) VALUES
+      ('1', 'Kubernetes 완벽 가이드', '김정현', '위키북스', 2022, '9791158392987', 'Kubernetes를 처음부터 끝까지 완벽하게 익히는 가이드북', 38000, 'https://via.placeholder.com/200x300/4A90E2/FFFFFF?text=K8s+Guide'),
+      ('2', 'Go 프로그래밍 입문', '이재홍', '한빛미디어', 2021, '9788968487293', 'Go 언어의 기초부터 실전까지 다루는 입문서', 32000, 'https://via.placeholder.com/200x300/50C878/FFFFFF?text=Go+Intro'),
+      ('3', 'Istio 서비스 메시 마스터', '박민수', '에이콘', 2023, '9788960883024', 'Istio를 활용한 서비스 메시 구축 및 운영', 42000, 'https://via.placeholder.com/200x300/E74C3C/FFFFFF?text=Istio+Master'),
+      ('4', 'React 완벽 가이드', '최영준', '길벗', 2022, '9791165921789', 'React를 활용한 모던 웹 애플리케이션 개발', 35000, 'https://via.placeholder.com/200x300/3498DB/FFFFFF?text=React+Guide'),
+      ('5', 'MariaDB 실전 가이드', '김철수', '제이펍', 2021, '9791190665285', 'MariaDB 설계부터 최적화까지', 38000, 'https://via.placeholder.com/200x300/9B59B6/FFFFFF?text=MariaDB'),
+      ('6', 'Redis 핵심 정리', '이영희', '인사이트', 2022, '9788966263523', 'Redis 캐싱 전략과 데이터 구조', 28000, 'https://via.placeholder.com/200x300/F39C12/FFFFFF?text=Redis+Core'),
+      ('7', 'Docker & Kubernetes 실습', '정수연', '위키북스', 2023, '9791158393215', '컨테이너 기반 애플리케이션 배포', 45000, 'https://via.placeholder.com/200x300/1ABC9C/FFFFFF?text=Docker+K8s'),
+      ('8', 'Karmada 멀티 클러스터 관리', '송민지', '에이콘', 2024, '9788960885123', 'Karmada로 멀티 클러스터 환경 구축하기', 48000, 'https://via.placeholder.com/200x300/E67E22/FFFFFF?text=Karmada')
+    ON DUPLICATE KEY UPDATE title=title;
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-central
+  namespace: default
+  labels:
+    app: mariadb-central
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb-central
+  template:
+    metadata:
+      labels:
+        app: mariadb-central
+    spec:
+      containers:
+      - name: mariadb
+        image: mariadb:10.11
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "rootpassword"
+        - name: MYSQL_DATABASE
+          value: "library"
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mariadb-storage
+          mountPath: /var/lib/mysql
+        - name: initdb
+          mountPath: /docker-entrypoint-initdb.d
+        livenessProbe:
+          exec:
+            command:
+            - mysqladmin
+            - ping
+            - -h
+            - localhost
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - mysql
+            - -h
+            - localhost
+            - -u
+            - root
+            - -prootpassword
+            - -e
+            - SELECT 1
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+      volumes:
+      - name: mariadb-storage
+        persistentVolumeClaim:
+          claimName: mariadb-pvc
+      - name: initdb
+        configMap:
+          name: mariadb-initdb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-central
+  namespace: default
+  labels:
+    app: mariadb-central
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3306
+    targetPort: 3306
+    protocol: TCP
+    name: mysql
+  selector:
+    app: mariadb-central
