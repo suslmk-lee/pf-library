@@ -29,6 +29,8 @@ export default function BooksPage() {
     try {
       setAddingBookId(book.id);
       await cartAPI.addToCart(book);
+      // 장바구니 업데이트 이벤트 발생
+      window.dispatchEvent(new Event('cartUpdated'));
       alert(`"${book.title}"이(가) 장바구니에 추가되었습니다.`);
     } catch (err: any) {
       alert(err.response?.data?.error || '장바구니 추가에 실패했습니다.');

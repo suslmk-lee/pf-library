@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
+	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -31,6 +32,11 @@ var (
 )
 
 func main() {
+	// .env.local 파일 로드 (파일이 없어도 에러 무시)
+	if err := godotenv.Load("../../.env.local"); err != nil {
+		log.Println("No .env.local file found, using environment variables or defaults")
+	}
+
 	// 환경 변수 읽기
 	dbHost := getEnv("DB_HOST", "mariadb-central.default.svc.cluster.local")
 	dbUser := getEnv("DB_USER", "root")
@@ -80,7 +86,7 @@ func main() {
 	router.POST("/logout", handleLogout)
 
 	// 서버 시작
-	port := getEnv("PORT", "8080")
+	port := getEnv("USER_SERVICE_PORT", getEnv("PORT", "8081"))
 	log.Printf("User service starting on port %s", port)
 	if err := router.Run(":" + port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)

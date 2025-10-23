@@ -34,6 +34,8 @@ export default function CartPage() {
     try {
       await cartAPI.removeFromCart(bookId);
       await loadCart();
+      // 장바구니 업데이트 이벤트 발생
+      window.dispatchEvent(new Event('cartUpdated'));
     } catch (err: any) {
       alert(err.response?.data?.error || '제거에 실패했습니다.');
     }
@@ -47,6 +49,8 @@ export default function CartPage() {
     try {
       await cartAPI.clearCart();
       await loadCart();
+      // 장바구니 업데이트 이벤트 발생
+      window.dispatchEvent(new Event('cartUpdated'));
     } catch (err: any) {
       alert(err.response?.data?.error || '장바구니 비우기에 실패했습니다.');
     }

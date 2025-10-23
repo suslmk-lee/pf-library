@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -34,6 +35,11 @@ var (
 )
 
 func main() {
+	// .env.local 파일 로드 (파일이 없어도 에러 무시)
+	if err := godotenv.Load("../../.env.local"); err != nil {
+		log.Println("No .env.local file found, using environment variables or defaults")
+	}
+
 	// 환경 변수 읽기
 	redisAddr := getEnv("REDIS_ADDR", "redis-central.default.svc.cluster.local:6379")
 
@@ -66,7 +72,7 @@ func main() {
 	router.POST("/cart/clear", authMiddleware(), handleClearCart)
 
 	// 서버 시작
-	port := getEnv("PORT", "8080")
+	port := getEnv("CART_SERVICE_PORT", getEnv("PORT", "8083"))
 	log.Printf("Cart service starting on port %s", port)
 	if err := router.Run(":" + port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)

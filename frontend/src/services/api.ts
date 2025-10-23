@@ -36,8 +36,16 @@ api.interceptors.response.use(
 // 인증 API
 export const authAPI = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
-    const response = await api.post<LoginResponse>('/users/login', data);
-    return response.data;
+    console.log('[API] Login request:', data);
+    console.log('[API] API Base URL:', API_BASE_URL);
+    try {
+      const response = await api.post<LoginResponse>('/users/login', data);
+      console.log('[API] Login response:', response);
+      return response.data;
+    } catch (error) {
+      console.error('[API] Login error:', error);
+      throw error;
+    }
   },
   logout: async (): Promise<void> => {
     await api.post('/users/logout');
@@ -47,11 +55,11 @@ export const authAPI = {
 // 도서 API
 export const bookAPI = {
   getBooks: async (): Promise<Book[]> => {
-    const response = await api.get<Book[]>('/books/books');
+    const response = await api.get<Book[]>('/books');
     return response.data;
   },
   getBook: async (id: string): Promise<Book> => {
-    const response = await api.get<Book>(`/books/books/${id}`);
+    const response = await api.get<Book>(`/books/${id}`);
     return response.data;
   },
 };
@@ -59,11 +67,11 @@ export const bookAPI = {
 // 장바구니 API
 export const cartAPI = {
   getCart: async (): Promise<CartItem[]> => {
-    const response = await api.get<CartItem[]>('/cart/cart');
+    const response = await api.get<CartItem[]>('/cart');
     return response.data;
   },
   addToCart: async (book: Book): Promise<void> => {
-    await api.post('/cart/cart/add', {
+    await api.post('/cart/add', {
       book_id: book.id,
       title: book.title,
       author: book.author,
@@ -72,10 +80,10 @@ export const cartAPI = {
     });
   },
   removeFromCart: async (bookId: string): Promise<void> => {
-    await api.delete(`/cart/cart/remove/${bookId}`);
+    await api.delete(`/cart/remove/${bookId}`);
   },
   clearCart: async (): Promise<void> => {
-    await api.post('/cart/cart/clear');
+    await api.post('/cart/clear');
   },
 };
 

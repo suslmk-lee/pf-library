@@ -19,7 +19,7 @@ metadata:
 data:
   init.sql: |
     CREATE DATABASE IF NOT EXISTS library CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    USE library;
+    USE pf2025;
 
     -- users 테이블
     CREATE TABLE IF NOT EXISTS users (

@@ -4,7 +4,7 @@
 set -e
 
 # 환경 변수 확인
-REGISTRY=${REGISTRY:-"your-registry.io/library"}
+REGISTRY=${REGISTRY:-"registry.k-paas.org/kpaas"}
 VERSION=${VERSION:-"v1.0.0"}
 
 echo "=================================="
