@@ -43,23 +43,44 @@ data:
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+    -- borrows 테이블 (도서 대여 정보)
+    CREATE TABLE IF NOT EXISTS borrows (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id VARCHAR(50) NOT NULL,
+      book_id VARCHAR(50) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      author VARCHAR(100),
+      borrowed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      due_date DATE NOT NULL,
+      returned_at TIMESTAMP NULL,
+      status ENUM('borrowed', 'returned', 'overdue') DEFAULT 'borrowed',
+      INDEX idx_user_id (user_id),
+      INDEX idx_book_id (book_id),
+      INDEX idx_status (status)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
     -- 샘플 사용자 데이터
     INSERT INTO users (id, username, password) VALUES
       ('1', 'user', 'password'),
       ('2', 'admin', 'admin123')
     ON DUPLICATE KEY UPDATE username=username;
 
-    -- 샘플 도서 데이터
+    -- 샘플 도서 데이터 (기본 8권)
+    -- 추가 100권의 도서 데이터는 scripts/sample_books_100.sql 참조
     INSERT INTO books (id, title, author, publisher, year, isbn, description, price, cover_image) VALUES
-      ('1', 'Kubernetes 완벽 가이드', '김정현', '위키북스', 2022, '9791158392987', 'Kubernetes를 처음부터 끝까지 완벽하게 익히는 가이드북', 38000, 'https://via.placeholder.com/200x300/4A90E2/FFFFFF?text=K8s+Guide'),
-      ('2', 'Go 프로그래밍 입문', '이재홍', '한빛미디어', 2021, '9788968487293', 'Go 언어의 기초부터 실전까지 다루는 입문서', 32000, 'https://via.placeholder.com/200x300/50C878/FFFFFF?text=Go+Intro'),
-      ('3', 'Istio 서비스 메시 마스터', '박민수', '에이콘', 2023, '9788960883024', 'Istio를 활용한 서비스 메시 구축 및 운영', 42000, 'https://via.placeholder.com/200x300/E74C3C/FFFFFF?text=Istio+Master'),
-      ('4', 'React 완벽 가이드', '최영준', '길벗', 2022, '9791165921789', 'React를 활용한 모던 웹 애플리케이션 개발', 35000, 'https://via.placeholder.com/200x300/3498DB/FFFFFF?text=React+Guide'),
-      ('5', 'MariaDB 실전 가이드', '김철수', '제이펍', 2021, '9791190665285', 'MariaDB 설계부터 최적화까지', 38000, 'https://via.placeholder.com/200x300/9B59B6/FFFFFF?text=MariaDB'),
-      ('6', 'Redis 핵심 정리', '이영희', '인사이트', 2022, '9788966263523', 'Redis 캐싱 전략과 데이터 구조', 28000, 'https://via.placeholder.com/200x300/F39C12/FFFFFF?text=Redis+Core'),
-      ('7', 'Docker & Kubernetes 실습', '정수연', '위키북스', 2023, '9791158393215', '컨테이너 기반 애플리케이션 배포', 45000, 'https://via.placeholder.com/200x300/1ABC9C/FFFFFF?text=Docker+K8s'),
-      ('8', 'Karmada 멀티 클러스터 관리', '송민지', '에이콘', 2024, '9788960885123', 'Karmada로 멀티 클러스터 환경 구축하기', 48000, 'https://via.placeholder.com/200x300/E67E22/FFFFFF?text=Karmada')
+      ('1', 'Kubernetes 완벽 가이드', '김정현', '위키북스', 2022, '9791158392987', 'Kubernetes를 처음부터 끝까지 완벽하게 익히는 가이드북', 38000, 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=200&h=300&fit=crop&auto=format'),
+      ('2', 'Go 프로그래밍 입문', '이재홍', '한빛미디어', 2021, '9788968487293', 'Go 언어의 기초부터 실전까지 다루는 입문서', 32000, 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=200&h=300&fit=crop&auto=format'),
+      ('3', 'Istio 서비스 메시 마스터', '박민수', '에이콘', 2023, '9788960883024', 'Istio를 활용한 서비스 메시 구축 및 운영', 42000, 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=200&h=300&fit=crop&auto=format'),
+      ('4', 'React 완벽 가이드', '최영준', '길벗', 2022, '9791165921789', 'React를 활용한 모던 웹 애플리케이션 개발', 35000, 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=200&h=300&fit=crop&auto=format'),
+      ('5', 'MariaDB 실전 가이드', '김철수', '제이펍', 2021, '9791190665285', 'MariaDB 설계부터 최적화까지', 38000, 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=200&h=300&fit=crop&auto=format'),
+      ('6', 'Redis 핵심 정리', '이영희', '인사이트', 2022, '9788966263523', 'Redis 캐싱 전략과 데이터 구조', 28000, 'https://images.unsplash.com/photo-1550439062-609e1531270e?w=200&h=300&fit=crop&auto=format'),
+      ('7', 'Docker & Kubernetes 실습', '정수연', '위키북스', 2023, '9791158393215', '컨테이너 기반 애플리케이션 배포', 45000, 'https://images.unsplash.com/photo-1484417894907-623942c8ee29?w=200&h=300&fit=crop&auto=format'),
+      ('8', 'Karmada 멀티 클러스터 관리', '송민지', '에이콘', 2024, '9788960885123', 'Karmada로 멀티 클러스터 환경 구축하기', 48000, 'https://images.unsplash.com/photo-1509966756634-9c23dd6e6815?w=200&h=300&fit=crop&auto=format')
     ON DUPLICATE KEY UPDATE title=title;
+
+    -- 추가 도서 데이터 import 방법:
+    -- kubectl cp scripts/sample_books_100.sql mariadb-central-xxx:/tmp/
+    -- kubectl exec mariadb-central-xxx -- mysql -u root -prootpassword library < /tmp/sample_books_100.sql
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -17,6 +17,7 @@ export default function LoginPage() {
       const response = await authAPI.login(formData);
       localStorage.setItem('token', response.token);
       localStorage.setItem('user_id', response.user_id);
+      localStorage.setItem('role', response.role);
       navigate('/books');
     } catch (err: any) {
       setError(err.response?.data?.error || '로그인에 실패했습니다.');
@@ -26,13 +27,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-2xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-xl border border-gray-200 p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            중앙 도서 관리 시스템
-          </h1>
-          <p className="text-gray-600">PlugFest 2025 Demo</p>
+          <div className="inline-block bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg mb-4">
+            <h1 className="text-3xl font-bold">
+              국립 중앙 도서관
+            </h1>
+          </div>
+          <p className="text-gray-600 font-medium">도서 대여 시스템 - PlugFest 2025</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -46,7 +49,7 @@ export default function LoginPage() {
               onChange={(e) =>
                 setFormData({ ...formData, id: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               placeholder="user"
               required
             />
@@ -62,7 +65,7 @@ export default function LoginPage() {
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               placeholder="password"
               required
             />
@@ -77,16 +80,18 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors disabled:bg-gray-400"
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-lg transition-all shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:from-gray-400 disabled:to-gray-400"
           >
             {loading ? '로그인 중...' : '로그인'}
           </button>
         </form>
 
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 mb-2">테스트 계정:</p>
-          <p className="text-xs text-gray-500">ID: user / PW: password</p>
-          <p className="text-xs text-gray-500">ID: admin / PW: admin123</p>
+        <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg">
+          <p className="text-sm text-gray-700 font-semibold mb-2">테스트 계정:</p>
+          <div className="space-y-1">
+            <p className="text-xs text-gray-600">• ID: user / PW: password</p>
+            <p className="text-xs text-gray-600">• ID: admin / PW: admin123</p>
+          </div>
         </div>
       </div>
     </div>

@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	userServiceAddr string
-	bookServiceAddr string
-	cartServiceAddr string
+	userServiceAddr   string
+	bookServiceAddr   string
+	borrowServiceAddr string
 )
 
 func main() {
@@ -24,14 +24,14 @@ func main() {
 		log.Println("No .env.local file found, using environment variables or defaults")
 	}
 
-	// 환경 변수 읽기 (로컬 개발용 또는 Istio 서비스 메시 FQDN 사용)
-	userServiceAddr = getEnv("USER_SERVICE_ADDR", "http://localhost:8081")
-	bookServiceAddr = getEnv("BOOK_SERVICE_ADDR", "http://localhost:8082")
-	cartServiceAddr = getEnv("CART_SERVICE_ADDR", "http://localhost:8083")
+	// 환경 변수 읽기 (기본값: Kubernetes 서비스 DNS)
+	userServiceAddr = getEnv("USER_SERVICE_ADDR", "http://user-service.default.svc.cluster.local:8080")
+	bookServiceAddr = getEnv("BOOK_SERVICE_ADDR", "http://book-service.default.svc.cluster.local:8080")
+	borrowServiceAddr = getEnv("BORROW_SERVICE_ADDR", "http://borrow-service.default.svc.cluster.local:8080")
 
 	log.Printf("User Service: %s", userServiceAddr)
 	log.Printf("Book Service: %s", bookServiceAddr)
-	log.Printf("Cart Service: %s", cartServiceAddr)
+	log.Printf("Borrow Service: %s", borrowServiceAddr)
 
 	// Gin 라우터 설정
 	router := gin.Default()
@@ -61,12 +61,12 @@ func main() {
 		proxyRequest(c, bookServiceAddr, "/api/books", "/books")
 	})
 
-	// Cart 서비스
-	router.Any("/api/cart", func(c *gin.Context) {
-		proxyRequest(c, cartServiceAddr, "/api/cart", "/cart")
+	// Borrow 서비스 (대출)
+	router.Any("/api/borrows", func(c *gin.Context) {
+		proxyRequest(c, borrowServiceAddr, "/api/borrows", "/borrows")
 	})
-	router.Any("/api/cart/*path", func(c *gin.Context) {
-		proxyRequest(c, cartServiceAddr, "/api/cart", "/cart")
+	router.Any("/api/borrows/*path", func(c *gin.Context) {
+		proxyRequest(c, borrowServiceAddr, "/api/borrows", "/borrows")
 	})
 
 	// 서버 시작

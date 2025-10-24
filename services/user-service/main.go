@@ -23,6 +23,7 @@ type LoginRequest struct {
 type LoginResponse struct {
 	Token  string `json:"token"`
 	UserID string `json:"user_id"`
+	Role   string `json:"role"`
 }
 
 var (
@@ -82,8 +83,8 @@ func main() {
 	})
 
 	// 인증 API
-	router.POST("/login", handleLogin)
-	router.POST("/logout", handleLogout)
+	router.POST("/users/login", handleLogin)
+	router.POST("/users/logout", handleLogout)
 
 	// 서버 시작
 	port := getEnv("USER_SERVICE_PORT", getEnv("PORT", "8081"))
@@ -101,9 +102,9 @@ func handleLogin(c *gin.Context) {
 	}
 
 	// MariaDB에서 사용자 조회
-	var userID, storedPassword string
-	query := "SELECT id, password FROM users WHERE username = ?"
-	err := db.QueryRow(query, req.ID).Scan(&userID, &storedPassword)
+	var userID, username, storedPassword, role string
+	query := "SELECT id, username, password, role FROM users WHERE username = ?"
+	err := db.QueryRow(query, req.ID).Scan(&userID, &username, &storedPassword, &role)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
@@ -123,20 +124,21 @@ func handleLogin(c *gin.Context) {
 	// 세션 토큰 생성
 	token := uuid.New().String()
 
-	// Redis에 세션 저장 (24시간 유효)
+	// Redis에 세션 저장 (24시간 유효) - username을 저장
 	sessionKey := "session:" + token
-	err = redisClient.Set(ctx, sessionKey, userID, 24*time.Hour).Err()
+	err = redisClient.Set(ctx, sessionKey, username, 24*time.Hour).Err()
 	if err != nil {
 		log.Printf("Redis error: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create session"})
 		return
 	}
 
-	log.Printf("User %s logged in successfully with token %s", req.ID, token)
+	log.Printf("User %s logged in successfully with token %s (role: %s)", username, token, role)
 
 	c.JSON(http.StatusOK, LoginResponse{
 		Token:  token,
-		UserID: userID,
+		UserID: username,
+		Role:   role,
 	})
 }
 

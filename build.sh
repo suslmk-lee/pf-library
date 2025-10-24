@@ -54,12 +54,12 @@ docker tag $REGISTRY/book-service:$VERSION $REGISTRY/book-service:latest
 print_info "✓ book-service built successfully"
 cd ../..
 
-# 3. Cart Service
-print_info "Building cart-service..."
-cd services/cart-service
-docker build -t $REGISTRY/cart-service:$VERSION .
-docker tag $REGISTRY/cart-service:$VERSION $REGISTRY/cart-service:latest
-print_info "✓ cart-service built successfully"
+# 3. Borrow Service
+print_info "Building borrow-service..."
+cd services/borrow-service
+docker build -t $REGISTRY/borrow-service:$VERSION .
+docker tag $REGISTRY/borrow-service:$VERSION $REGISTRY/borrow-service:latest
+print_info "✓ borrow-service built successfully"
 cd ../..
 
 # 4. API Gateway
@@ -98,8 +98,8 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     docker push $REGISTRY/book-service:$VERSION
     docker push $REGISTRY/book-service:latest
 
-    docker push $REGISTRY/cart-service:$VERSION
-    docker push $REGISTRY/cart-service:latest
+    docker push $REGISTRY/borrow-service:$VERSION
+    docker push $REGISTRY/borrow-service:latest
 
     docker push $REGISTRY/api-gateway:$VERSION
     docker push $REGISTRY/api-gateway:latest
@@ -112,7 +112,7 @@ else
     print_warn "Skipping push. You can push manually later with:"
     echo "  docker push $REGISTRY/user-service:$VERSION"
     echo "  docker push $REGISTRY/book-service:$VERSION"
-    echo "  docker push $REGISTRY/cart-service:$VERSION"
+    echo "  docker push $REGISTRY/borrow-service:$VERSION"
     echo "  docker push $REGISTRY/api-gateway:$VERSION"
     echo "  docker push $REGISTRY/frontend:$VERSION"
 fi

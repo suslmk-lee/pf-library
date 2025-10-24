@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-books-data
+  namespace: default
+data:
+  books-data.sql: |
+    -- 추가 도서 데이터 100권 (국립중앙도서관 스타일)
+    -- 로컬 개발 환경에서는 scripts/sample_books_100.sql을 직접 import하세요
+    -- 이 ConfigMap은 Kubernetes 배포 시 사용됩니다
+
+    -- 참고: 전체 데이터는 scripts/sample_books_100.sql 파일을 확인하세요
+    -- Kubernetes 배포 시 아래 명령으로 데이터를 추가할 수 있습니다:
+    -- kubectl exec -it mariadb-central-xxx -- mysql -u root -prootpassword library < /docker-entrypoint-initdb.d/books-data.sql

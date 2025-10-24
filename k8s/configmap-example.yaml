@@ -1,0 +1,41 @@
+# ConfigMap for Kubernetes deployment
+# 이 파일은 예시이며, 실제 값은 환경에 맞게 수정하세요
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: library-config
+  namespace: default
+data:
+  # Database Configuration
+  DB_HOST: "mariadb-central.default.svc.cluster.local"
+  DB_USER: "root"
+  DB_PASSWORD: "rootpassword"
+  DB_NAME: "library"
+
+  # Redis Configuration
+  REDIS_ADDR: "redis-central.default.svc.cluster.local:6379"
+
+  # Service Ports (default: 8080 for all services in K8s)
+  USER_SERVICE_PORT: "8080"
+  BOOK_SERVICE_PORT: "8080"
+  CART_SERVICE_PORT: "8080"
+  API_GATEWAY_PORT: "8080"
+
+  # Service Addresses (API Gateway에서 사용)
+  # 기본값이 이미 설정되어 있으므로 변경이 필요한 경우에만 설정
+  # USER_SERVICE_ADDR: "http://user-service.default.svc.cluster.local:8080"
+  # BOOK_SERVICE_ADDR: "http://book-service.default.svc.cluster.local:8080"
+  # CART_SERVICE_ADDR: "http://cart-service.default.svc.cluster.local:8080"
+
+---
+# Secret for sensitive data (base64 encoded)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: library-secrets
+  namespace: default
+type: Opaque
+data:
+  # echo -n 'rootpassword' | base64
+  DB_PASSWORD: cm9vdHBhc3N3b3Jk
